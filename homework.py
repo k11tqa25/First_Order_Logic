@@ -20,8 +20,8 @@ def read_file(filename):
             if "|" in cnf:
                 sentences.append(cnf)
                 q = negate(queries[0])
-                if has_predicate(cnf, q):
-                    resolve(cnf, q)
+                # if has_predicate(cnf, q):
+                #     resolve(cnf, q)
             else:
                 resolved.add(cnf)
             # kbs.append(f.readline().strip())
@@ -99,8 +99,18 @@ def is_variable(param):
     return not re.search(cap, param)
 
 
-def replace_param(pred, param, newvalue):
-    pass
+def replace_param(pred, param, new_value):
+    split = pred.split("(")
+    params = split[1].strip(")")
+    args = params.split(",")
+    for i, arg in enumerate(args):
+        args[i] = arg.strip()
+        if arg.strip() == param:
+            args[i] = new_value
+    return split[0] + "(" + ",".join(args) + ")"
+
+
 
 
 read_file("input1.txt")
+print(replace_param("Play(x, y)", "y", "Teddy"))
