@@ -2,13 +2,13 @@ import re
 
 queries = []
 sentences = []
-resolved = set()
+constant = []
 
 
 def read_file(filename):
     queries.clear()
     sentences.clear()
-    resolved.clear()
+    constant.clear()
     with open(filename, 'r') as f:
         N = int(f.readline().strip())
         for i in range(N):
@@ -19,19 +19,61 @@ def read_file(filename):
             cnf = to_cnf(f.readline().strip())
             if "|" in cnf:
                 sentences.append(cnf)
-                q = negate(queries[0])
-                # if has_predicate(cnf, q):
-                #     resolve(cnf, q)
             else:
-                resolved.add(cnf)
+                constant.append(cnf)
             # kbs.append(f.readline().strip())
 
 
-def has_predicate(sentence, pred):
+def solve():
+    ans = []
+    resolved_sentence = []
+    resolved = []
+    asked = set()
+    solved = False
+
+    def ask(pred):
+        for s in resolved_sentence:
+            if has_neg_predicate(s, pred):
+                res = resolve(s, pred)
+                if res:
+                    if "|" in res:
+                        if res not in resolved_sentence:
+                            resolved_sentence.append(res)
+                            resolved.extend(list(asked))
+                            print(f"New Sentence: {res}")
+                    else:
+                        if negate(res) in asked:
+                            print(f"Conflict found: {res}, {negate(res)}")
+                            return True
+                        else:
+                            if res not in resolved:
+                                print(f"New Resolved: {res}")
+                                resolved.append(res)
+        return False
+
+    for q in queries:
+        nq = negate(q)
+        print(f"Solving for {q} by adding {nq}")
+        resolved_sentence = [s for s in sentences]
+        resolved = [c for c in constant]
+        resolved.insert(0, nq)
+        asked = set()
+        solved = False
+        while len(resolved) > 0:
+            r = resolved.pop()
+            if ask(r):
+                solved = True
+                break
+            asked.add(r)
+        print(f"TELL: {solved}")
+        ans.append(solved)
+
+
+def has_neg_predicate(sentence, pred):
     name = ("~" if "~" in pred else "") + get_pred_name(pred)
     neg_name = negate(name)
 
-    if "~" in pred:
+    if "~" in neg_name:
         return neg_name in sentence
     else:
         return neg_name in sentence and name not in sentence
@@ -45,8 +87,9 @@ def resolve(sentence, pred):
     sentence_split = sentence.split("|")
     for p in sentence_split:
         if neg_name in p:
-            # TODO: What are the invalid cases?
             for p1, p2 in zip(get_arg(p), get_arg(pred)):
+                p1 = p1.strip()
+                p2 = p2.strip()
                 if is_variable(p1) & is_variable(p2):
                     return None
                 elif is_variable(p1) | is_variable(p2):
@@ -57,7 +100,16 @@ def resolve(sentence, pred):
                 else:
                     if p1 != p2:
                         return None
+            sentence_split.remove(p)
             break
+
+    for i, p in enumerate(sentence_split):
+        p_args = get_arg(p)
+        for arg in p_args:
+            if arg in args:
+                sentence_split[i] = replace_param(p, arg, args[arg])
+
+    return "|".join(sentence_split)
 
 
 def to_cnf(implication):
@@ -110,7 +162,5 @@ def replace_param(pred, param, new_value):
     return split[0] + "(" + ",".join(args) + ")"
 
 
-
-
 read_file("input1.txt")
-print(replace_param("Play(x, y)", "y", "Teddy"))
+print(solve())
