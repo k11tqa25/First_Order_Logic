@@ -3,7 +3,7 @@ import re
 queries = []
 sentences = []
 constant = []
-
+verbal = False
 
 def read_file(filename):
     queries.clear()
@@ -29,7 +29,6 @@ def solve():
     resolved_sentence = []
     resolved = []
     asked = set()
-    solved = False
 
     def ask(pred):
         for s in resolved_sentence:
@@ -40,20 +39,24 @@ def solve():
                         if res not in resolved_sentence:
                             resolved_sentence.append(res)
                             resolved.extend(list(asked))
-                            print(f"New Sentence: {res}")
+                            if verbal:
+                                print(f"New Sentence: {res}")
                     else:
                         if negate(res) in asked:
-                            print(f"Conflict found: {res}, {negate(res)}")
+                            if verbal:
+                                print(f"Conflict found: {res}, {negate(res)}")
                             return True
                         else:
-                            if res not in resolved:
-                                print(f"New Resolved: {res}")
+                            if res not in asked:
+                                if verbal:
+                                    print(f"New Resolved: {res}")
                                 resolved.append(res)
         return False
 
     for q in queries:
         nq = negate(q)
-        print(f"Solving for {q} by adding {nq}")
+        if verbal:
+            print(f"Solving for {q} by adding {nq}")
         resolved_sentence = [s for s in sentences]
         resolved = [c for c in constant]
         resolved.insert(0, nq)
@@ -65,8 +68,10 @@ def solve():
                 solved = True
                 break
             asked.add(r)
-        print(f"TELL: {solved}")
+        if verbal:
+            print(f"TELL: {solved}")
         ans.append(solved)
+    print(ans)
 
 
 def has_neg_predicate(sentence, pred):
@@ -87,6 +92,7 @@ def resolve(sentence, pred):
     sentence_split = sentence.split("|")
     for p in sentence_split:
         if neg_name in p:
+
             for p1, p2 in zip(get_arg(p), get_arg(pred)):
                 p1 = p1.strip()
                 p2 = p2.strip()
@@ -162,5 +168,5 @@ def replace_param(pred, param, new_value):
     return split[0] + "(" + ",".join(args) + ")"
 
 
-read_file("input1.txt")
-print(solve())
+read_file("input3.txt")
+solve()

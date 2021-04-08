@@ -14,6 +14,7 @@ class TestHomework(unittest.TestCase):
         self.assertFalse(func("~Ready(x)|~Ready(y)|Play(x,y)", "Play(Teddy, Hayley)"))
         self.assertTrue(func("~Ready(x)|~Ready(y)|Play(x,y)", "~Play(Hayley, Teddy)"))
         self.assertTrue(func('~Start(x)|~Healthy(x)|Ready(x)', 'Healthy(Teddy)'))
+        self.assertTrue(func("Learn(Paw,x)|Working(y)|Greet(x,y)","Greet(A,B)"))
 
     def test_resolve(self):
         func = homework.resolve
@@ -23,6 +24,8 @@ class TestHomework(unittest.TestCase):
                          func("~Ready(x)|~Ready(y)|Play(Tim,y)", "~Play(Hayley, Teddy)"))
         self.assertEqual("~Start(Hayley)",
                          func("~Start(x)|Healthy(x)", "~Healthy(Hayley)"))
+        self.assertEqual("~Learn(Paw,A)|~Working(B)",
+                         func("~Learn(Paw,x)|~Working(y)|Greet(x,y)", "~Greet(A,B)"))
 
     def test_replace_parameter(self):
         func = homework.replace_param
