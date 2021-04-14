@@ -1,0 +1,8 @@
+1
+PlayOutside(Kevin)
+5
+HoldParty(x) => ~Rain(Wednesday)
+Rain(x) => ~PlayOutside(x)
+PlayOutside(x) => ~Rain(x)
+HoldParty(Kevin)
+Rain(Wednesday)

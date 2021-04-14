@@ -71,7 +71,9 @@ def solve():
         if verbal:
             print(f"TELL: {solved}")
         ans.append(solved)
-    print(ans)
+    # print(ans)
+    with open("output.txt", "w") as f:
+        f.writelines(map(lambda x: str(x)+"\n", ans))
 
 
 def has_neg_predicate(sentence, pred):
@@ -168,5 +170,5 @@ def replace_param(pred, param, new_value):
     return split[0] + "(" + ",".join(args) + ")"
 
 
-read_file("input3.txt")
+read_file("input.txt")
 solve()

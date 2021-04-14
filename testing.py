@@ -14,7 +14,7 @@ class TestHomework(unittest.TestCase):
         self.assertFalse(func("~Ready(x)|~Ready(y)|Play(x,y)", "Play(Teddy, Hayley)"))
         self.assertTrue(func("~Ready(x)|~Ready(y)|Play(x,y)", "~Play(Hayley, Teddy)"))
         self.assertTrue(func('~Start(x)|~Healthy(x)|Ready(x)', 'Healthy(Teddy)'))
-        self.assertTrue(func("Learn(Paw,x)|Working(y)|Greet(x,y)","Greet(A,B)"))
+        self.assertTrue(func("Learn(Paw,x)|Working(y)|~Greet(x,y)", "Greet(A,B)"))
 
     def test_resolve(self):
         func = homework.resolve
